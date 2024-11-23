@@ -1,9 +1,9 @@
 [  {
     "kernelSource": {
       "name": "miku-KernelSU",
-      "repo": "https://github.com/PhamtomK12/kernel_xiaomi_odin",
-      "branch": "TDA",
-      "device": "odin"
+      "repo": "https://github.com/creamcroissant/android_kernel_xiaomi_sdm660",
+      "branch": "11-EAS",
+      "device": "clover"
     },
     "withKernelSU": true,
     "toolchains": [
