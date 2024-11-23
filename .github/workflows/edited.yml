@@ -171,7 +171,7 @@ jobs:
       - name: "💙 Upload Image.gz"
         uses: actions/upload-artifact@v3
         with:
-          name: Image.gz(${{ env.kernelDevice }}-${{{ env.kernelName }}-${{ env.kernelBranch }})
+          name: Image.gz(${{ env.kernelDevice }}-${{ env.kernelName }}-${{ env.kernelBranch }})
           path: ./${{ env.kernelDir }}/${{ env.OUT_DIR }}/arch/${{ env.ARCH }}/boot/Image.gz
           if-no-files-found: ignore
           retention-days: 7
