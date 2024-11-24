@@ -93,6 +93,7 @@ jobs:
           CLANG_TRIPLE=$(echo $params | jq -r ".CLANG_TRIPLE")
           AR=$(echo $params | jq -r ".AR")
           CC=$(echo $params | jq -r ".CC")
+          LD=$(echo $params | jq -r ".LD")
 
           echo "ARCH=$ARCH" >> $GITHUB_ENV
 
@@ -118,6 +119,9 @@ jobs:
           fi
           if [ -n "$CC" ]; then
             args="$args CC=$CC"
+          fi
+          if [ -n "$LD" ]; then
+            args="$args LD=$LD"
           fi
           echo "args=$args" >> $GITHUB_OUTPUT
 
