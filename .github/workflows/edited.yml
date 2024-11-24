@@ -55,12 +55,11 @@ jobs:
           sudo apt-get install -y build-essential bc curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
           sudo apt-get install -y llvm clang binutils-gold
 
-      - name: "🔗 Create symlink for LLVMgold.so"
-        run: |
-          sudo ln -s /usr/lib/llvm-X.Y/lib/LLVMgold.so /usr/lib/LLVMgold.so
-
       - name: "🌍 Set environment variables"
         run: |
+          echo "/usr/lib" | sudo tee -a /etc/ld.so.conf.d/llvm.conf
+          sudo ldconfig
+          export LD=ld.lld
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib
 
       - name: "🌟 Clone kernel source => (${{ env.kernelRepo }})"
@@ -109,24 +108,13 @@ jobs:
             mkdir -p $(pwd)/${{ env.OUT_DIR }}
             args="$args O=$(pwd)/${{ env.OUT_DIR }}"
           fi
-          if [ -n "$ARCH" ]; then
-            args="$args ARCH=$ARCH"
-          fi
-          if [ -n "$CROSS_COMPILE" ]; then
-            args="$args CROSS_COMPILE=$CROSS_COMPILE"
-          fi
-          if [ -n "$CLANG_TRIPLE" ]; then
-            args="$args CLANG_TRIPLE=$CLANG_TRIPLE"
-          fi
-          if [ -n "$CROSS_COMPILE_COMPAT" ]; then
-            args="$args CROSS_COMPILE_ARM32=$CROSS_COMPILE_COMPAT"
-          fi
-          if [ -n "$AR" ]; then
-            args="$args AR=$AR"
-          fi
-          if [ -n "$CC" ]; then
-            args="$args CC=$CC"
-          fi
+          if [ -n "$ARCH" ]; then args="$args ARCH=$ARCH"; fi
+          if [ -n "$CROSS_COMPILE" ]; then args="$args CROSS_COMPILE=$CROSS_COMPILE"; fi
+          if [ -n "$CLANG_TRIPLE" ]; then args="$args CLANG_TRIPLE=$CLANG_TRIPLE"; fi
+          if [ -n "$CROSS_COMPILE_COMPAT" ]; then args="$args CROSS_COMPILE_ARM32=$CROSS_COMPILE_COMPAT"; fi
+          if [ -n "$AR" ]; then args="$args AR=$AR"; fi
+          if [ -n "$CC" ]; then args="$args CC=$CC"; fi
+          if [ -n "$LD" ]; then args="$args LD=$LD"; fi
           echo "args=$args" >> $GITHUB_OUTPUT
 
       - name: "😋 Update KernelSU"
