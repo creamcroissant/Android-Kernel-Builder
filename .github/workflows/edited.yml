@@ -55,10 +55,6 @@ jobs:
           sudo apt-get install -y build-essential bc curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
           sudo apt-get install -y llvm clang binutils-gold
 
-      - name: "🔍 Find LLVMgold.so"
-        run: |
-          find / -name LLVMgold.so
-
       - name: "🔗 Create symlink for LLVMgold.so"
         run: |
           sudo ln -s /usr/lib/llvm-X.Y/lib/LLVMgold.so /usr/lib/LLVMgold.so
