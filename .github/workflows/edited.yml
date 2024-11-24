@@ -59,17 +59,6 @@ jobs:
           sudo apt-get install -y llvm clang binutils-gold
           sudo apt-get install -y llvm-dev
 
-      - name: "🔗 Create symlink for LLVMgold.so"
-        run: |
-          sudo ln -s $(find /usr/lib/llvm-*/lib/LLVMgold.so | head -n 1) /usr/lib/LLVMgold.so
-
-      - name: "🌍 Set environment variables"
-        run: |
-          echo "/usr/lib" | sudo tee -a /etc/ld.so.conf.d/llvm.conf
-          sudo ldconfig
-          export LD=ld.lld
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib
-
       - name: "🌟 Clone kernel source => (${{ env.kernelRepo }})"
         working-directory: ./${{ env.kernelDir }}
         run: |
