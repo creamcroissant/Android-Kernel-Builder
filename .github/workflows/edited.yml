@@ -3,7 +3,6 @@ name: "Build kernels"
 env:
   CONFIGURATION: "repos.json"
   OUT_DIR: "out"
-  LD: "ld.lld"  # 添加此行
 
 on:
   workflow_dispatch:
@@ -22,7 +21,7 @@ jobs:
         id: generate-matrix
         run: |
           echo "repos<<EOF" >> $GITHUB_OUTPUT
-          cat ${{ env.CONFIGURATION }} >> $GITHUB_OUTPUT
+          cat  ${{ env.CONFIGURATION }} >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
   Build-Kernel:
@@ -37,11 +36,14 @@ jobs:
         repos: ${{ fromJSON(needs.Set-repos.outputs.repos) }}
     env:
       kernelDir: ${{ matrix.repos.kernelSource.name }}_${{ matrix.repos.kernelSource.device }}
+
       kernelName: ${{ matrix.repos.kernelSource.name }}
       kernelRepo: ${{ matrix.repos.kernelSource.repo }}
       kernelBranch: ${{ matrix.repos.kernelSource.branch }}
       kernelDevice: ${{ matrix.repos.kernelSource.device }}
+
       DEFCONFIG_NAME: ${{ matrix.repos.kernelSource.device }}_defconfig
+
       withKernelSU: ${{ matrix.repos.withKernelSU }}
     steps:
       - name: "✨ Create working dir"
@@ -51,6 +53,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bc curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
+          sudo apt-get install -y llvm clang binutils-gold
+
+      - name: "🔍 Find LLVMgold.so"
+        run: |
+          find / -name LLVMgold.so
+
+      - name: "🔗 Create symlink for LLVMgold.so"
+        run: |
+          sudo ln -s /usr/lib/llvm-X.Y/lib/LLVMgold.so /usr/lib/LLVMgold.so
+
+      - name: "🌍 Set environment variables"
+        run: |
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib
 
       - name: "🌟 Clone kernel source => (${{ env.kernelRepo }})"
         working-directory: ./${{ env.kernelDir }}
@@ -90,7 +105,6 @@ jobs:
           CLANG_TRIPLE=$(echo $params | jq -r ".CLANG_TRIPLE")
           AR=$(echo $params | jq -r ".AR")
           CC=$(echo $params | jq -r ".CC")
-          LD=$(echo $params | jq -r ".LD")
 
           echo "ARCH=$ARCH" >> $GITHUB_ENV
 
@@ -116,9 +130,6 @@ jobs:
           fi
           if [ -n "$CC" ]; then
             args="$args CC=$CC"
-          fi
-          if [ -n "$LD" ]; then
-            args="$args LD=$LD"
           fi
           echo "args=$args" >> $GITHUB_OUTPUT
 
