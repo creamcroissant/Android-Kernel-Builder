@@ -53,7 +53,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bc curl git zip ftp gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi libssl-dev lftp zstd wget libfl-dev python2 python3 libarchive-tools
+
+      - name: "🌍 Install LLVM and gold linker"
+        run: |
           sudo apt-get install -y llvm clang binutils-gold
+          sudo apt-get install -y llvm-dev
+
+      - name: "🔗 Create symlink for LLVMgold.so"
+        run: |
+          sudo ln -s $(find /usr/lib/llvm-*/lib/LLVMgold.so | head -n 1) /usr/lib/LLVMgold.so
 
       - name: "🌍 Set environment variables"
         run: |
